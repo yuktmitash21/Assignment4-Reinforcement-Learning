@@ -25,9 +25,35 @@ public class Movement extends SimpleAction implements FullActionModel {
 				directionProbs[i] = 0.8;
 			}
 			else{
-				directionProbs[i] = 0.2/3.;
+				directionProbs[i] = 0.2/3;
 			}
 		}
+		/*if (direction == 0) {
+			directionProbs[0] = 0.8;
+			directionProbs[1] = 0.0;
+			directionProbs[2] = 0.1;
+			directionProbs[3] = 0.1;
+
+
+		} else if (direction == 1) {
+			directionProbs[1] = 0.8;
+			directionProbs[2] = 0.1;
+			directionProbs[3] = 0.1;
+			directionProbs[0] = 0.0;
+
+		} else if (direction == 2) {
+			directionProbs[2] = 0.8;
+			directionProbs[0] = 0.1;
+			directionProbs[1] = 0.1;
+			directionProbs[3] = 0.0;
+
+		} else {
+			directionProbs[3] = 0.8;
+			directionProbs[0] = 0.1;
+			directionProbs[1] = 0.1;
+			directionProbs[2] = 0.0;
+
+		}*/
 		this.map = map;
 	}
 
@@ -140,4 +166,3 @@ public class Movement extends SimpleAction implements FullActionModel {
 
 
 }
-

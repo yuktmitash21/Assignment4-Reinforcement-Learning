@@ -7,7 +7,9 @@ import assignment4.util.BasicTerminalFunction;
 import assignment4.util.MapPrinter;
 import burlap.oomdp.core.Domain;
 import burlap.oomdp.core.TerminalFunction;
+import burlap.oomdp.core.objects.ObjectInstance;
 import burlap.oomdp.core.states.State;
+import burlap.oomdp.singleagent.GroundedAction;
 import burlap.oomdp.singleagent.RewardFunction;
 import burlap.oomdp.singleagent.environment.SimulatedEnvironment;
 import burlap.oomdp.singleagent.explorer.VisualExplorer;
@@ -18,34 +20,37 @@ public class HardGridWorldLauncher {
 	private static boolean visualizeInitialGridWorld = true; //Loads a GUI with the agent, walls, and goal
 	
 	//runValueIteration, runPolicyIteration, and runQLearning indicate which algorithms will run in the experiment
-	private static boolean runValueIteration = true; 
-	private static boolean runPolicyIteration = true;
+	private static boolean runValueIteration = false;
+	private static boolean runPolicyIteration = false;
 	private static boolean runQLearning = true;
 	
 	//showValueIterationPolicyMap, showPolicyIterationPolicyMap, and showQLearningPolicyMap will open a GUI
 	//you can use to visualize the policy maps. Consider only having one variable set to true at a time
 	//since the pop-up window does not indicate what algorithm was used to generate the map.
-	private static boolean showValueIterationPolicyMap = true; 
-	private static boolean showPolicyIterationPolicyMap = true;
+	private static boolean showValueIterationPolicyMap = false;
+	private static boolean showPolicyIterationPolicyMap = false;
 	private static boolean showQLearningPolicyMap = true;
 	
-	private static Integer MAX_ITERATIONS = 100;
-	private static Integer NUM_INTERVALS = 100;
+	private static Integer MAX_ITERATIONS = 7000;
+	private static Integer NUM_INTERVALS = 7000;
+
+	private static double livingRewatd = -0.01;
 
 	protected static int[][] userMap = new int[][] { 
 										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+										{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+										{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+										{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-										{ 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0},
-										{ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
-										{ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
-										{ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
-										{ 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0},
 										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},};
+										{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+										{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+										{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+										{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},};
 
 //	private static Integer mapLen = map.length-1;
+	//67 and 104
 
 	public static void main(String[] args) {
 		// convert to BURLAP indexing
@@ -59,8 +64,53 @@ public class HardGridWorldLauncher {
 
 		State initialState = BasicGridWorld.getExampleState(domain);
 
-		RewardFunction rf = new BasicRewardFunction(maxX,maxY); //Goal is at the top right grid
-		TerminalFunction tf = new BasicTerminalFunction(maxX,maxY); //Goal is at the top right grid
+		RewardFunction rf = new RewardFunction() {
+			@Override
+			public double reward(State state, GroundedAction groundedAction, State state1) {
+				ObjectInstance agent = state1.getFirstObjectOfClass(BasicGridWorld.CLASSAGENT);
+				int ax = agent.getIntValForAttribute(BasicGridWorld.ATTX);
+				int ay = agent.getIntValForAttribute(BasicGridWorld.ATTY);
+				if (ay == 4 && ax != 10 && ax!= 0) {
+					return -5;
+				}
+				if (ay == 6 && ax != 10 && ax!= 0) {
+					return -5;
+				}
+
+				if (ax == 10 && ay == 5) {
+					return 5;
+				}
+				return livingRewatd;
+			}
+		};
+
+		TerminalFunction tf = new TerminalFunction() {
+			@Override
+			public boolean isTerminal(State state) {
+				ObjectInstance agent = state.getFirstObjectOfClass(BasicGridWorld.CLASSAGENT);
+				int ax = agent.getIntValForAttribute(BasicGridWorld.ATTX);
+				int ay = agent.getIntValForAttribute(BasicGridWorld.ATTY);
+
+				if (ay == 4 && ax != 10 && ax!= 0) {
+					return true;
+				}
+				if (ay == 6 && ax != 10 && ax!= 0) {
+					return true;
+				}
+
+				if (ax == 10 && ay == 5) {
+					return true;
+				}
+
+				return false;
+
+
+
+			}
+		};
+
+
+	//	TerminalFunction tf = new BasicTerminalFunction(maxX,maxY); //Goal is at the top right grid
 		
 		SimulatedEnvironment env = new SimulatedEnvironment(domain, rf, tf,
 				initialState);

@@ -1,9 +1,14 @@
 package assignment4.util;
 
 import burlap.oomdp.core.values.DoubleArrayValue;
+import com.opencsv.CSVWriter;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.primitives.UnsignedInts.max;
 
 public final class AnalysisAggregator {
 	private static List<Integer> numIterations = new ArrayList<Integer>();
@@ -18,7 +23,7 @@ public final class AnalysisAggregator {
 	private static List<Double> rewardsForValueIteration = new ArrayList<Double>();
 	private static List<Double> rewardsForPolicyIteration = new ArrayList<Double>();
 	private static List<Double> rewardsForQLearning = new ArrayList<Double>();
-	
+
 	public static void addNumberOfIterations(Integer numIterations1){
 		numIterations.add(numIterations1);
 	}
@@ -31,17 +36,18 @@ public final class AnalysisAggregator {
 	public static void addStepsToFinishQLearning(Integer stepsToFinishQLearning1){
 		stepsToFinishQLearning.add(stepsToFinishQLearning1);
 	}
+
 	public static void printValueIterationResults(){
-		System.out.print("Value Iteration,");	
-		printList(stepsToFinishValueIteration);
+		File file = new File("./valueIteration.csv");
+		printList(file, rewardsForValueIteration, millisecondsToFinishValueIteration, stepsToFinishValueIteration);
 	}
 	public static void printPolicyIterationResults(){
-		System.out.print("Policy Iteration,");	
-		printList(stepsToFinishPolicyIteration);
+		File file = new File("./policyIteration.csv");
+		printList(file, rewardsForPolicyIteration, millisecondsToFinishPolicyIteration, stepsToFinishPolicyIteration);
 	}
 	public static void printQLearningResults(){
-		System.out.print("Q Learning,");	
-		printList(stepsToFinishQLearning);
+		File file = new File("./QLearning.csv");
+		printList(file, rewardsForQLearning, millisecondsToFinishQLearning, stepsToFinishQLearning);
 	}
 	
 
@@ -63,82 +69,54 @@ public final class AnalysisAggregator {
 	public static void addQLearningReward(double reward) {
 		rewardsForQLearning.add(reward);
 	}
-	public static void printValueIterationTimeResults(){
-		System.out.print("Value Iteration,");	
-		printList(millisecondsToFinishValueIteration);
-	}
-	public static void printPolicyIterationTimeResults(){
-		System.out.print("Policy Iteration,");
-		printList(millisecondsToFinishPolicyIteration);
-	}
 
-	public static void printQLearningTimeResults(){
-		System.out.print("Q Learning,");	
-		printList(millisecondsToFinishQLearning);
-	}
 
-	public static void printValueIterationRewards(){
-		System.out.print("Value Iteration Rewards,");
-		printDoubleList(rewardsForValueIteration);
-	}
+	private static void printList(File file,
+								  List<Double> rewards, List<Integer> time,
+								  List<Integer> steps){
+		FileWriter outputfile;
+		CSVWriter writer = null;
+		try {
+			outputfile = new FileWriter(file);
+			writer = new CSVWriter(outputfile);
 
-	public static void printPolicyIterationRewards(){
-		System.out.print("Policy Iteration Rewards,");
-		printDoubleList(rewardsForPolicyIteration);
-	}
 
-	public static void printQLearningRewards(){
-		System.out.print("Q Learning Rewards,");
-		printDoubleList(rewardsForQLearning);
-	}
+			String[] header = {"Iterations", "Rewards", "Time", "Steps"};
+			writer.writeNext(header);
+			int[] sizes = {rewards.size(), time.size(), steps.size()};
+			int size = max(sizes);
+			System.out.println("size" + size);
+			for (int i = 0; i < size; i++) {
+				String myReward = "";
+				String myTime = "";
+				String mySteps = "";
 
-	public static void printNumIterations(){
-		System.out.print("Iterations,");	
-		printList(numIterations);
-	}
-	private static void printList(List<Integer> valueList){
-		int counter = 0;
-		for(int value : valueList){
-			System.out.print(String.valueOf(value));
-			if(counter != valueList.size()-1){
-				System.out.print(",");
+				if (i < rewards.size()) {
+					myReward = String.valueOf(rewards.get(i));
+				}
+				if (i < time.size()) {
+					myTime = String.valueOf(time.get(i));
+				}
+				if (i < steps.size()) {
+					mySteps = String.valueOf(steps.get(i));
+				}
+				String iterations = (i + 1) + "";
+				String[] header1 = {iterations, myReward, myTime, mySteps};
+				writer.writeNext(header1);
+				System.out.println(iterations + " " + myReward + " " + myTime + " " + mySteps);
 			}
-			counter++;
+
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		System.out.println();
 	}
-	private static void printDoubleList(List<Double> valueList){
-		int counter = 0;
-		for(double value : valueList){
-			System.out.print(String.valueOf(value));
-			if(counter != valueList.size()-1){
-				System.out.print(",");
-			}
-			counter++;
-		}
-		System.out.println();
-	}
+
 	public static void printAggregateAnalysis(){
 		System.out.println("//Aggregate Analysis//\n");
-		System.out.println("The data below shows the number of steps/actions the agent required to reach \n"
-				+ "the terminal state given the number of iterations the algorithm was run.");
-		printNumIterations();
 		printValueIterationResults();
 		printPolicyIterationResults();
 		printQLearningResults();
-		System.out.println();
-		System.out.println("The data below shows the number of milliseconds the algorithm required to generate \n"
-				+ "the optimal policy given the number of iterations the algorithm was run.");
-		printNumIterations();
-		printValueIterationTimeResults();
-		printPolicyIterationTimeResults();
-		printQLearningTimeResults();
 
-		System.out.println("\nThe data below shows the total reward gained for \n"
-				+ "the optimal policy given the number of iterations the algorithm was run.");
-		printNumIterations();
-		printValueIterationRewards();
-		printPolicyIterationRewards();
-		printQLearningRewards();
 	}
 }

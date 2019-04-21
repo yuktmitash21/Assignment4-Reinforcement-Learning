@@ -38,6 +38,35 @@ public class WallPainter implements StaticPainter {
 
 				//is there a wall here?
 				if(this.map[i][j] == 1){
+					g2.setColor(Color.BLACK);
+
+					//left coordinate of cell on our canvas
+					float rx = i*width;
+
+					//top coordinate of cell on our canvas
+					//coordinate system adjustment because the java canvas
+					//origin is in the top left instead of the bottom right
+					float ry = cHeight - height - j*height;
+
+					//paint the rectangle
+					g2.fill(new Rectangle2D.Float(rx, ry, width, height));
+
+				} else if (i == 4 && j == 0) {
+					g2.setColor(Color.RED);
+
+					//left coordinate of cell on our canvas
+					float rx = i*width;
+
+					//top coordinate of cell on our canvas
+					//coordinate system adjustment because the java canvas
+					//origin is in the top left instead of the bottom right
+					float ry = cHeight - height - j*height;
+
+					//paint the rectangle
+					g2.fill(new Rectangle2D.Float(rx, ry, width, height));
+
+				} else if (i == 4 && j == 4) {
+					g2.setColor(Color.BLUE);
 
 					//left coordinate of cell on our canvas
 					float rx = i*width;

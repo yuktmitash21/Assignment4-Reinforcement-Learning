@@ -152,6 +152,7 @@ public class AnalysisRunner {
 				env.resetEnvironment();
 			}
 			agent.initializeForPlanning(rf, tf, 1);
+			//agent.setMaximumEpisodesForPlanning(3000);
 			p = agent.planFromState(initialState);
 			AnalysisAggregator.addQLearningReward(calcRewardInEpisode(ea));
 			AnalysisAggregator.addMillisecondsToFinishQLearning((int) (System.nanoTime()-startTime)/1000000);

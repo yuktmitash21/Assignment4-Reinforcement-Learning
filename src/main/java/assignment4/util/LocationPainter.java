@@ -21,7 +21,7 @@ public class LocationPainter implements ObjectPainter {
 							float cWidth, float cHeight) {
 
 		//agent will be filled in blue
-		g2.setColor(Color.BLUE);
+		//g2.setColor(Color.WHITE);
 
 		//set up floats for the width and height of our domain
 		float fWidth = this.map.length;
